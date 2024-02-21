@@ -3,23 +3,37 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dark Mode Color Sampler</title>
+<title>DarkMode Color Sampler</title>
 <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body class="bg-gray-100 p-8">
+<body class="bg-gray-100 p-8" style="background-color:#656a86 ;">
 <div class="max-w-md mx-auto bg-white rounded-lg shadow-md p-8">
-    <h2 class="text-xl font-bold mb-4">Dark Mode Color Sampler</h2>
+    <h2 class="text-xl font-bold mb-4">DarkMode Color Sampler</h2>
     <div class="mb-4">
         <label for="baseColor" class="block text-gray-700">Base Color:</label>
         <input type="color" id="baseColor" class="mt-1 px-4 py-2 border rounded-md w-full">
         <output id="baseColorOutput" class="block mt-2 text-gray-600"></output>
     </div>
     <div class="mb-4">
+        <label for="darknessIntensity" class="block text-gray-700">Darkness Intensity:</label>
+        <input type="range" id="darknessIntensity" min="0" max="1" step="0.01" value="0.5" class="mt-1 w-full">
+    </div>
+    <div class="mb-4">
         <label class="block text-gray-700">Predicted Dark Mode Color:</label>
         <div id="colorSample" class="w-16 h-16 border border-gray-400 rounded-md mb-2"></div>
         <output id="darkModeColorOutput" class="block mt-2 text-gray-600"></output>
     </div>
-    <a href="https://realtimecolors.com" target="_blank" class="text-blue-500 underline">Test Your Colors</a>
+    <div class="mb-4">
+        <button id="randomizeColorButton" class="mt-4 px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600">Randomize Color</button>
+
+    </div>
+    <div class="mb-4">
+        <a href="https://realtimecolors.com" target="_blank" id="testColorsLink" class="text-blue-500 underline">Test Your Colors</a>
+    </div>
+    <div class="mt-4">
+        <h1 class="text-xl font-bold mb-4">How it works</h1>
+        <p>Dark Mode Color Sampler is a tool that allows you to visualize how a chosen color would appear in a dark mode environment. Simply select a base color using the color picker, adjust the darkness intensity with the slider, and instantly preview the dark mode version of the color. You can also explore further color options by clicking the 'Test Your Colors' link or generate random colors with the 'Randomize Color' button.</p>
+    </div>
 </div>
 
 <script>
@@ -28,6 +42,13 @@
         var colorSample = document.getElementById('colorSample');
         var baseColorOutput = document.getElementById('baseColorOutput');
         var darkModeColorOutput = document.getElementById('darkModeColorOutput');
+        var darknessIntensity = document.getElementById('darknessIntensity').value;
+        var testColorsLink = document.getElementById('testColorsLink');
+        var sliderTrackColor = 'rgba(' + parseInt(baseColor.substr(1, 2), 16) + ',' + parseInt(baseColor.substr(3, 2), 16) + ',' + parseInt(baseColor.substr(5, 2), 16) + ',0.5)';
+        
+        // Update CSS variables to set slider color
+        document.documentElement.style.setProperty('--slider-thumb-color', baseColor);
+        document.documentElement.style.setProperty('--slider-track-color', sliderTrackColor);
         
         // Parse the base color into RGB components
         var r = parseInt(baseColor.substring(1, 3), 16);
@@ -38,9 +59,9 @@
         baseColorOutput.textContent = baseColor;
         
         // Adjust the color to simulate dark mode (making it darker)
-        r = Math.floor(r * 0.5);
-        g = Math.floor(g * 0.5);
-        b = Math.floor(b * 0.5);
+        r = Math.floor(r * darknessIntensity);
+        g = Math.floor(g * darknessIntensity);
+        b = Math.floor(b * darknessIntensity);
         
         // Convert back to hexadecimal
         var darkModeColor = '#' + 
@@ -51,10 +72,21 @@
         // Update the sample color and output
         colorSample.style.backgroundColor = darkModeColor;
         darkModeColorOutput.textContent = darkModeColor;
+        
+        // Update the color of the "Test Your Colors" link
+        testColorsLink.style.color = baseColor;
+    }
+    
+    function randomizeColor() {
+        var randomColor = '#'+Math.floor(Math.random()*16777215).toString(16);
+        document.getElementById('baseColor').value = randomColor;
+        updateColor();
     }
 
-    // Call updateColor initially and whenever the base color changes
+    // Call updateColor initially and whenever the base color or darkness intensity changes
     document.getElementById('baseColor').addEventListener('input', updateColor);
+    document.getElementById('darknessIntensity').addEventListener('input', updateColor);
+    document.getElementById('randomizeColorButton').addEventListener('click', randomizeColor);
     updateColor();
 </script>
 </body>
